@@ -24,9 +24,9 @@ class Grid(QtWidgets.QMainWindow):
     def initUI(self):
         boardx = 800
         boardy = 800
-        border = 5
-        xcount = 9
-        ycount = 6
+        border = 1
+        xcount = 20
+        ycount = 20
         self.resize(boardx+border*(xcount+1), boardy+border*(ycount+1))
         board = {}
 
@@ -42,7 +42,7 @@ class Grid(QtWidgets.QMainWindow):
                 board[x, y].btn.resize(boardx/xcount, boardy/ycount)
                 #board[x, y].btn.setText(str(x) + "," + str(y))
 
-                board[x, y].btn.clicked.connect(lambda state, c=board[x, y]:c.setcolor("#EEEEEE"))
+                board[x, y].btn.clicked.connect(lambda state, c=board[x, y]:c.setcolor("#333333"))
 
 
     def printcoord(self, coord):
