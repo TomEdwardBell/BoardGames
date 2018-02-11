@@ -22,12 +22,12 @@ class Grid(QtWidgets.QMainWindow):
         self.initUI()
 
     def initUI(self):
-        boardx = 700
-        boardy = 700
-        border = 0
-        xcount = 1
-        ycount = 9
-        self.resize(boardx+border*(xcount+1), boardy+border*(xcount+1))
+        boardx = 800
+        boardy = 800
+        border = 5
+        xcount = 9
+        ycount = 6
+        self.resize(boardx+border*(xcount+1), boardy+border*(ycount+1))
         board = {}
 
         for x in range(xcount):
@@ -40,7 +40,7 @@ class Grid(QtWidgets.QMainWindow):
                 yloc = (y*ypercoord + (y+1)*border)
                 board[x, y].btn.move(xloc, yloc)
                 board[x, y].btn.resize(boardx/xcount, boardy/ycount)
-                board[x, y].btn.setText(str(x) + "," + str(y))
+                #board[x, y].btn.setText(str(x) + "," + str(y))
 
                 board[x, y].btn.clicked.connect(lambda state, c=board[x, y]:c.setcolor("#EEEEEE"))
 

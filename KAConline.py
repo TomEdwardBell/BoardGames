@@ -35,7 +35,7 @@ class Grid(QtWidgets.QMainWindow):
     def initUI(self):
         boardx = 700
         boardy = 700
-        border = 3
+        border = 0
         xcount = 3
         ycount = 3
 
@@ -79,6 +79,8 @@ class Grid(QtWidgets.QMainWindow):
             [[0, 0], [1, 1], [2, 2]],
             [[0, 2], [1, 1], [2, 0]]
         ]
+
+
         for player in ["O", "X"]:
             for winningboard in possiblewins:
                 wonyet = True

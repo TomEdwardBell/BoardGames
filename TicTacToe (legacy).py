@@ -4,11 +4,10 @@ import random
 import time
 
 
-class Coord():
+class Coord:
     def __init__(self, game):
         self.btn = QtWidgets.QPushButton(game)
         self.value = " "
-
 
     def setcolor(self, color):
         if color == "rand":
@@ -33,9 +32,9 @@ class Grid(QtWidgets.QMainWindow):
         self.initUI()
 
     def initUI(self):
-        boardx = 400
-        boardy = 400
-        border = 0
+        boardx = 700
+        boardy = 700
+        border = 5
         xcount = 3
         ycount = 3
 
