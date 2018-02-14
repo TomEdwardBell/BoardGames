@@ -1,7 +1,6 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtWidgets, QtTest
 import sys
 import random
-import time
 
 
 class Coord:
@@ -32,9 +31,9 @@ class Grid(QtWidgets.QMainWindow):
         self.initUI()
 
     def initUI(self):
-        boardx = 700
-        boardy = 700
-        border = 5
+        boardx = 650
+        boardy = 650
+        border = 0
         xcount = 3
         ycount = 3
 
@@ -50,11 +49,13 @@ class Grid(QtWidgets.QMainWindow):
                 self.board[x, y].btn.move(xloc, yloc)
                 self.board[x, y].btn.resize(boardx/xcount, boardy/ycount)
 
+
         for x in range(xcount):
             for y in range(ycount):
                 self.board[x, y].btn.clicked.connect(lambda state, c=(x, y): self.doturn(c))
 
     def doturn(self, coordnumbers):
+        nextturn = ""
         if self.board[coordnumbers].value == " " and self.won == False:
             if self.currentturn == "O":
                 nextturn = "X"
@@ -78,25 +79,38 @@ class Grid(QtWidgets.QMainWindow):
             [[0, 0], [1, 1], [2, 2]],
             [[0, 2], [1, 1], [2, 0]]
         ]
+        wonyet = False
+        drawn = True
         for player in ["O", "X"]:
             for winningboard in possiblewins:
                 wonyet = True
                 for coord in winningboard:
                     x = coord[0]
                     y = coord[1]
-                    if not (self.board[x, y].value == player) or self.board[x, y].value == "":
+                    if not (self.board[x, y].value == player) or self.board[x, y].value == " ":
                         wonyet = False
-
+                    if self.board[x, y].value == " ":
+                        drawn = False
                 if wonyet:
                     winner = player
                     self.win(winner, winningboard)
+        if drawn == True and self.won == False:
+            self.draw()
 
     def win(self,winner, winningboard):
         self.won = True
         for i in winningboard:
+            QtTest.QTest.qWait(100)
             x = i[0]
             y = i[1]
             self.board[x, y].btn.setStyleSheet("background-color: #33DD36; font-size: 60pt;")
+
+    def draw(self):
+        for x in range(3):
+            for y in range(3):
+                self.board[x, y].btn.setStyleSheet("background-color: #DDDD11; font-size: 60pt;")
+
+
 
     def printcoord(self, coord):
         print(coord.coordinates)

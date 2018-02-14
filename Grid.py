@@ -1,7 +1,6 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtWidgets
 import sys
 import random
-from functools import partial
 
 
 class Coord:
@@ -24,9 +23,9 @@ class Grid(QtWidgets.QMainWindow):
     def initUI(self):
         boardx = 800
         boardy = 800
-        border = 1
-        xcount = 20
-        ycount = 20
+        border = 90
+        xcount = 35
+        ycount = 34
         self.resize(boardx+border*(xcount+1), boardy+border*(ycount+1))
         board = {}
 
@@ -42,7 +41,7 @@ class Grid(QtWidgets.QMainWindow):
                 board[x, y].btn.resize(boardx/xcount, boardy/ycount)
                 #board[x, y].btn.setText(str(x) + "," + str(y))
 
-                board[x, y].btn.clicked.connect(lambda state, c=board[x, y]:c.setcolor("#333333"))
+                board[x, y].btn.clicked.connect(lambda state, c=board[x, y]:c.setcolor("rand"))
 
 
     def printcoord(self, coord):

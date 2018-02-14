@@ -1,14 +1,34 @@
-from PyQt5 import QtCore, QtGui, QtWidgets, QtTest
-import sys
+import gspread, sys
+from PyQt5 import QtWidgets, QtTest
+from oauth2client.service_account import ServiceAccountCredentials
 import random
-import gspread
 
 
-class Coord():
+
+class Server:
+    def __init__(self):
+        servername = "null"
+        scope = ['https://spreadsheets.google.com/feeds']
+        creds = ServiceAccountCredentials.from_json_keyfile_name('client_access.json', scope)
+        client = gspread.authorize(creds)
+        print("jljf")
+        self.sheet = client.open("KAConline").worksheet(servername)
+        self.board = {}
+        print(self.board)
+
+    def changeserver(self,severnumber):
+
+
+    def checkboard(self):
+        for x in range(3):
+            for y in range(3):
+                pass
+                #self.sheet
+
+class Coord:
     def __init__(self, game):
         self.btn = QtWidgets.QPushButton(game)
         self.value = " "
-
 
     def setcolor(self, color):
         if color == "rand":
@@ -27,14 +47,14 @@ class Coord():
 class Grid(QtWidgets.QMainWindow):
     def __init__(self):
         super(Grid, self).__init__()
-        self.currentturn = "O"  # "X" or "O"
-        self.board = {}
-        self.won = False
+        self.server = Server()
+
         self.initUI()
 
+
     def initUI(self):
-        boardx = 900
-        boardy = 900
+        boardx = 650
+        boardy = 650
         border = 0
         xcount = 3
         ycount = 3
@@ -42,79 +62,31 @@ class Grid(QtWidgets.QMainWindow):
         self.resize(boardx + border * (xcount + 1), boardy + border * (xcount + 1))
         for x in range(xcount):
             for y in range(ycount):
-                self.board[x, y] = Coord(self)
-                self.board[x, y].coordinates = [x, y]
+                self.server.board[x, y] = Coord(self)
+                self.server.board[x, y].coordinates = [x, y]
+
                 xpercoord = (boardx / xcount)
                 ypercoord = (boardy / ycount)
                 xloc = (x*xpercoord + (x+1)*border)
                 yloc = (y*ypercoord + (y+1)*border)
-                self.board[x, y].btn.move(xloc, yloc)
-                self.board[x, y].btn.resize(boardx/xcount, boardy/ycount)
+                self.server.board[x, y].btn.move(xloc, yloc)
+                self.server.board[x, y].btn.resize(boardx/xcount, boardy/ycount)
 
 
         for x in range(xcount):
             for y in range(ycount):
-                self.board[x, y].btn.clicked.connect(lambda state, c=(x, y): self.doturn(c))
+                self.board[x, y].btn.clicked.connect(lambda state, c=(x, y): self.btnclicked(c))
 
-    def doturn(self, coordnumbers):
-        if self.board[coordnumbers].value == " " and self.won == False:
-            if self.currentturn == "O":
-                nextturn = "X"
-            if self.currentturn == "X":
-                nextturn = "O"
+    def btnclicked(self, coords):
+        pass
 
-            self.currentturn = nextturn
-            self.board[(coordnumbers[0],coordnumbers[1])].setValue(self.currentturn)
-            self.checkboard()
-
-    def checkboard(self):
-        possiblewins = [
-            [[0, 0], [0, 1], [0, 2]],
-            [[1, 0], [1, 1], [1, 2]],
-            [[2, 0], [2, 1], [2, 2]],
-
-            [[0, 0], [1, 0], [2, 0]],
-            [[0, 1], [1, 1], [2, 1]],
-            [[0, 2], [1, 2], [2, 2]],
-
-            [[0, 0], [1, 1], [2, 2]],
-            [[0, 2], [1, 1], [2, 0]]
-        ]
-        wonyet = False
-        drawn = True
-        for player in ["O", "X"]:
-            for winningboard in possiblewins:
-                wonyet = True
-                for coord in winningboard:
-                    x = coord[0]
-                    y = coord[1]
-                    if not (self.board[x, y].value == player) or self.board[x, y].value == " ":
-                        wonyet = False
-                    if self.board[x, y].value == " ":
-                        drawn = False
-                if wonyet:
-                    winner = player
-                    self.win(winner, winningboard)
-        if drawn == True and self.won == False:
-            self.draw()
-
-    def win(self,winner, winningboard):
-        self.won = True
-        for i in winningboard:
-            QtTest.QTest.qWait(100)
-            x = i[0]
-            y = i[1]
-            self.board[x, y].btn.setStyleSheet("background-color: #33DD36; font-size: 60pt;")
-
-    def draw(self):
+    def loadboard(self):
         for x in range(3):
             for y in range(3):
-                self.board[x, y].btn.setStyleSheet("background-color: #DDDD11; font-size: 60pt;")
+                newvalue = self.server
 
+                self.board[x ,y].setValue(newvalue)
 
-
-    def printcoord(self, coord):
-        print(coord.coordinates)
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
