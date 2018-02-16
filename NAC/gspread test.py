@@ -2,7 +2,6 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 
 
-
 class Server:
     def __init__(self, servernumber):
         servername = "Sever" + str(servernumber)
