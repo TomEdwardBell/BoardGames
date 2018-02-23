@@ -23,18 +23,18 @@ class Grid(QtWidgets.QMainWindow):
     def initUI(self):
         boardx = 800
         boardy = 800
-        border = 90
-        xcount = 35
-        ycount = 34
-        self.resize(boardx+border*(xcount+1), boardy+border*(ycount+1))
+        border = 10
+        xcount = 7
+        ycount = 7
+        self.resize(boardx+border*(xcount+2), boardy+border*(ycount+2))
         board = {}
 
         for x in range(xcount):
             for y in range(ycount):
                 board[x, y] = Coord(self)
                 board[x, y].coordinates = [x,y]
-                xpercoord = (boardx / xcount)
-                ypercoord = (boardy / ycount)
+                xpercoord = (boardx / (xcount+ xcount*border))
+                ypercoord = ((boardy  + ycount*border) / (ycount))
                 xloc = (x*xpercoord + (x+1)*border)
                 yloc = (y*ypercoord + (y+1)*border)
                 board[x, y].btn.move(xloc, yloc)

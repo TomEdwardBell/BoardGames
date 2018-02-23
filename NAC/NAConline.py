@@ -1,7 +1,9 @@
-import gspread, sys
-from PyQt5 import QtWidgets, QtTest
+from gspread import authorize
+import sys
+from PyQt5 import QtWidgets, QtTest, QtCore, QtGui
 from oauth2client.service_account import ServiceAccountCredentials
 import random
+import time
 
 
 class Menu(QtWidgets.QMainWindow):
@@ -12,23 +14,88 @@ class Menu(QtWidgets.QMainWindow):
         self.show()
 
     def initUI(self):
-        self.resize(512, 512)
+        self.resize(512, 256)
 
         self.widgets["title_lbl"] = QtWidgets.QLabel(self)
         self.widgets["title_lbl"].setText("Noughts and Crosses!")
-        self.widgets["title_lbl"].resize(512,96)
-        self.widgets["title_lbl"].setStyleSheet("text-align: center; font-size: 20pt")
+        self.widgets["title_lbl"].resize(512,60)
+        self.widgets["title_lbl"].setStyleSheet("font-size: 50px")
+        self.widgets["title_lbl"].setAlignment(QtCore.Qt.AlignCenter)
 
         self.widgets["subtitle_lbl"] = QtWidgets.QLabel(self)
         self.widgets["subtitle_lbl"].setText("Online")
+        self.widgets["subtitle_lbl"].move(0,60)
+        self.widgets["subtitle_lbl"].resize(512, 40)
+        self.widgets["subtitle_lbl"].setStyleSheet("font-size: 35px; font-style: italic")
+        self.widgets["subtitle_lbl"].setAlignment(QtCore.Qt.AlignCenter)
 
-    def start(self):
-        game = Grid()
-        game.show
+        self.widgets["start_btn"] = QtWidgets.QPushButton(self)
+        self.widgets["start_btn"].move(0,128)
+        self.widgets["start_btn"].resize(256,128)
+        self.widgets["start_btn"].setText("Start")
+        #self.widgets["start_btn"].clicked.connect(lambda:self.widgets["title_lbl"].setText("Loading"))
+
+        self.widgets["start_btn"].clicked.connect(self.gameload)
+
+        self.widgets["quit_btn"] = QtWidgets.QPushButton(self)
+        self.widgets["quit_btn"].move(256, 128)
+        self.widgets["quit_btn"].resize(256, 128)
+        self.widgets["quit_btn"].setText("Quit")
+        self.widgets["quit_btn"].clicked.connect(sys.exit)
+
+    def gameload(self):
+        self.hide()
+        selection = GameSelect()
+        player = selection.info()
+        load = Loading()
+        game = Grid(player)
+        game.show()
+        load.hide()
+
+
+class GameSelect(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(GameSelect, self).__init__()
+        self.widgets = {}
+
+    def info(self):
+        player = self.Player()
+        print(self.Player.name)
+        return(player)
+
+
+class Player:
+    def __init__(self):
+        self.username = ""
+        self.type = "" #other or user
+        self.
+
+class Loading(QtWidgets.QMainWindow):
+    def __init__(self):
+        super(Loading, self).__init__()
+        self.widgets = {}
+        self.widgets["title_lbl"] = QtWidgets.QLabel(self)
+        self.widgets["title_lbl"].resize(512, 60)
+        self.widgets["title_lbl"].setStyleSheet("font-size: 50px")
+        self.widgets["title_lbl"].setAlignment(QtCore.Qt.AlignCenter)
+
+        self.widgets["subtitle_lbl"] = QtWidgets.QLabel(self)
+        self.widgets["subtitle_lbl"].move(0, 60)
+        self.widgets["subtitle_lbl"].resize(512, 40)
+        self.widgets["subtitle_lbl"].setStyleSheet("font-size: 35px; font-style: italic")
+        self.widgets["subtitle_lbl"].setAlignment(QtCore.Qt.AlignCenter)
+
+        self.widgets["title_lbl"].setText("Loading")
+        self.widgets["subtitle_lbl"].setText("Please wait")
+        self.resize(512, 128)
+        self.show()
+        QtGui.QGuiApplication.processEvents()
 
 class Grid(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, player):
         super(Grid, self).__init__()
+        self.hide()
+
         self.server = Server()
         self.widgets = {}
         self.initUI()
@@ -46,6 +113,7 @@ class Grid(QtWidgets.QMainWindow):
         self.widgets["servernamelbl"].resize(90, 30)
         self.widgets["servernamelbl"].move(0, 0)
 
+
         self.widgets["changeserverln"] = QtWidgets.QLineEdit(self)
         self.widgets["changeserverln"].move(0, 30)
         self.widgets["changeserverln"].resize(90, 30)
@@ -57,7 +125,9 @@ class Grid(QtWidgets.QMainWindow):
 
         self.resize(boardx + border * (xcount + 1), boardy + border * (xcount + 1) + header)
 
+
         self.makeboard(xcount, ycount, border, header, boardx, boardy)
+
 
     def makeboard(self, xcount, ycount, border, header, boardx, boardy):
         for x in range(xcount):
@@ -97,7 +167,7 @@ class Server:
         servername = "test"
         scope = ['https://spreadsheets.google.com/feeds']
         creds = ServiceAccountCredentials.from_json_keyfile_name('client_access.json', scope)
-        client = gspread.authorize(creds)
+        client = authorize(creds)
 
         self.sheet = client.open("NAConline").worksheet(servername)
         self.board = {}
@@ -106,7 +176,7 @@ class Server:
     def changeserver(self, severname):
         scope = ['https://spreadsheets.google.com/feeds']
         creds = ServiceAccountCredentials.from_json_keyfile_name('client_access.json', scope)
-        client = gspread.authorize(creds)
+        client = authorize(creds)
         self.sheet = client.open("NAConline").worksheet(severname)
 
     def checkboard(self):

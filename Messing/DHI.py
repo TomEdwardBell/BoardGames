@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtTest
+from PyQt5 import QtWidgets, QtTest, QtGui
 import sys
 import random
 
@@ -7,12 +7,8 @@ class Coord:
     def __init__(self, game):
         self.btn = QtWidgets.QPushButton(game)
 
-    def setcolor(self, color):
-        if color == "rand":
-            hexes = ["0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F"]
-            color = "#"
-            for q in range(6):
-                color= color + random.choice(hexes)
+    def setcolor(self, r,g,b):
+        color = '#%02x%02x%02x' % (r, g ,b)
         self.btn.setStyleSheet("background-color:"+color)
 
 class Grid(QtWidgets.QMainWindow):
@@ -24,8 +20,8 @@ class Grid(QtWidgets.QMainWindow):
         boardx = 800
         boardy = 800
         border = 0
-        xcount = 10
-        ycount = 10
+        xcount = 8
+        ycount = 8
         self.resize(boardx+border*(xcount+1), boardy+border*(ycount+1))
         board = {}
 
@@ -39,15 +35,21 @@ class Grid(QtWidgets.QMainWindow):
                 yloc = (y*ypercoord + (y+1)*border)
                 board[x, y].btn.move(xloc, yloc)
                 board[x, y].btn.resize(boardx/xcount, boardy/ycount)
-                board[x, y].setcolor("#FFFFFF")
                 #board[x, y].btn.setText(str(x) + "," + str(y))
 
         self.show()
+
+        count = 0
         while True:
-            x = random.randint(0,(xcount-1))
-            y = random.randint(0,(ycount-1))
-            board[x, y].setcolor("#" + random.choice(["888888","858585"]))
-            QtTest.QTest.qWait(0.001)
+            x = random.randint
+            y = 1
+            r = 3
+            g = 23
+            b = 100
+
+            board[x, y].setcolor(r, g, b)
+            QtGui.QGuiApplication.processEvents()
+
 
     def printcoord(self, coord):
         print(coord.coordinates)
