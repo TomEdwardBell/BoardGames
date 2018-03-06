@@ -34,7 +34,6 @@ class Menu(QtWidgets.QMainWindow):
         self.widgets["start_btn"].resize(256,128)
         self.widgets["start_btn"].setText("Start")
         #self.widgets["start_btn"].clicked.connect(lambda:self.widgets["title_lbl"].setText("Loading"))
-
         self.widgets["start_btn"].clicked.connect(self.gameload)
 
         self.widgets["quit_btn"] = QtWidgets.QPushButton(self)
@@ -45,30 +44,11 @@ class Menu(QtWidgets.QMainWindow):
 
     def gameload(self):
         self.hide()
-        selection = GameSelect()
-        player = selection.info()
         load = Loading()
-        game = Grid(player)
-        game.show()
-        load.hide()
+        game = MainGame()
+        game.server = "1"
+        load.show()
 
-
-class GameSelect(QtWidgets.QMainWindow):
-    def __init__(self):
-        super(GameSelect, self).__init__()
-        self.widgets = {}
-
-    def info(self):
-        player = self.Player()
-        print(self.Player.name)
-        return(player)
-
-
-class Player:
-    def __init__(self):
-        self.username = ""
-        self.type = "" #other or user
-        self.
 
 class Loading(QtWidgets.QMainWindow):
     def __init__(self):
@@ -89,10 +69,25 @@ class Loading(QtWidgets.QMainWindow):
         self.widgets["subtitle_lbl"].setText("Please wait")
         self.resize(512, 128)
         self.show()
+        v = QtWidgets.QPushButton(self)
+        v.clicked.connect(self.nothing)
         QtGui.QGuiApplication.processEvents()
 
+    def nothing(self):
+        print("fguis")
+
+
+class MainGame:
+    def __init__(self):
+        board = Grid()
+        server = Server()
+        server.changeboard("1")
+        originalboard = server.loadboard()
+        print(originalboard)
+
+
 class Grid(QtWidgets.QMainWindow):
-    def __init__(self, player):
+    def __init__(self):
         super(Grid, self).__init__()
         self.hide()
 
@@ -164,7 +159,7 @@ class Grid(QtWidgets.QMainWindow):
 
 class Server:
     def __init__(self):
-        servername = "test"
+        servername = "start"
         scope = ['https://spreadsheets.google.com/feeds']
         creds = ServiceAccountCredentials.from_json_keyfile_name('client_access.json', scope)
         client = authorize(creds)
@@ -173,21 +168,21 @@ class Server:
         self.board = {}
         print(self.board)
 
-    def changeserver(self, severname):
+    def changeboard(self, severname):
         scope = ['https://spreadsheets.google.com/feeds']
         creds = ServiceAccountCredentials.from_json_keyfile_name('client_access.json', scope)
         client = authorize(creds)
         self.sheet = client.open("NAConline").worksheet(severname)
 
-    def checkboard(self):
+    def getboard(self):
+        fullboard = []
         for x in range(3):
+            fullboard.append([])
             for y in range(3):
-                pass
-                # self.sheet
+                fullboard[x].append(x, y, self.getvalue(x, y))
 
     def getvalue(self, x, y):
         value = self.sheet.cell((y + 1), (x + 1)).value
-
         return (value)
 
     def newvalue(self, x, y, change):
