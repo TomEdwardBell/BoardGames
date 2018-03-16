@@ -6,20 +6,41 @@ import random
 
 class MainGame():
     def __init__(self):
-        self.menu = Menu()
-        self.gametype = ""
+        self.menu = Menu(self)
+        self.gametype = input("Play as: ")
+
+        if self.gametype == "client":
+            self.game_as_client()
+        if self.gametype == "server":
+            self.game_as_server()
 
     def game_as_client(self):
         self.gametype = "client"
         self.username = self.menu.username
+        #self.usernanme = input("Username: ")
+        #self.character = self.choose_character()
+        #servertojoin = input("Server to join: ")
+        self.server = Client("0110")
+
+    def choose_character(self):
+        valid = False
+        character = ""
+        while not valid:
+            character = input("Character: ")
+            if len(character) != 0:
+                valid = True
+        return character
 
     def game_as_server(self):
         self.gametype = "server"
-        self.servername = "nac-"+random.randint(1000,9999)
+        servername = "nac-"+str(random.randint(1000,9999))
+        self.server = Server(servername)
+
 
 
 class Menu():
-    def __init__(self):
+    def __init__(self,maingame):
+        self.maingame = maingame
         self.done = False
         self.username = ""
         self.welcome_screen = self.WelcomeScreen(self)
@@ -29,7 +50,6 @@ class Menu():
             super(Menu.WelcomeScreen, self).__init__()
             self.widgets = {}
             self.init_ui(parent)
-
 
         def init_ui(self, parent):
             self.resize(300, 300)
@@ -47,7 +67,6 @@ class Menu():
             self.widgets["ok_btn"].setStyleSheet("font-size: 30pt")
             self.widgets["ok_btn"].resize(300, 150)
             self.widgets["ok_btn"].move(0, 150)
-
 
             self.show()
 
@@ -120,10 +139,10 @@ class Menu():
             self.show()
 
         def start_client(self,parent,username):
-            parent.start_client()
+            self.maingame.game_as_client()
 
         def start_server(self,parent,username):
-            pass
+            self.maingame.game_as_server()
 
 class BoardUi(QtWidgets.QMainWindow):
     def __init__(self):
@@ -157,12 +176,23 @@ class BoardUi(QtWidgets.QMainWindow):
 
 
 class Server:  # Totally not stolen code...
-    def __init__(self):
-        print("Server created")
+    def __init__(self, servername):
+        print("Server being made")
+        self.servername = servername
+        self.board = {}
+        self.soc = ""
+
+        self.board_creation()
         self.start_server()
 
-    def processing(self,toprocess):
-        print("Processing "+toprocess)
+
+    def board_creation(self):
+        for x in range(3):
+            for y in range(3):
+                self.board[x, y] = " "
+
+    def processing(self, toprocess):
+        print("Processing "+ toprocess)
         # Should be like s22X
         # Will set the coordinate 2,2 to X
         return (toprocess)
@@ -183,40 +213,42 @@ class Server:  # Totally not stolen code...
         print('Connection ' + ip + ':' + port + " ended")
 
     def start_server(self):
-        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # this is for easy starting/killing the app
-        soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         print('Socket created')
 
         try:
-            soc.bind(("127.0.0.1", 12345))
+            self.soc.bind(("127.0.0.1", 12345))
             print('Socket bind complete')
         except socket.error as msg:
             print('Bind failed. Error : ' + str(exc_info()))
             exit()
 
-        soc.listen(10)
+        self.soc.listen(10)
         print('Socket now listening')
         accepting = True
         while accepting:
-            conn, addr = soc.accept()
+            conn, addr = self.soc.accept()
             ip, port = str(addr[0]), str(addr[1])
             print('Accepting connection from ' + ip + ':' + port)
 
             Thread(target=self.client_thread, args=(conn, ip, port)).start()
 
-        soc.close()
+        self.soc.close()
 
 
 class Client:
-    def __init__(self):
-        soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        soc.connect(("127.0.0.1", 12345))
+    def __init__(self, servername):
+        self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.soc.connect(("127.0.0.1", 12345))
 
-        clients_input = input("Send to Server")
-        soc.send(clients_input.encode("utf8"))
+    def send(self, clients_input):
+        self.soc.send(clients_input.encode("utf8"))
+        self.recieve()
 
-        result_bytes = soc.recv(4096)
+    def recieve(self):
+        result_bytes = self.soc.recv(4096)
         result_string = result_bytes.decode("utf8")
 
         print("Result from server is {}".format(result_string))
