@@ -3,7 +3,7 @@ from PyQt5 import QtWidgets, QtCore
 import socket
 
 
-class MainGame():
+class MainGame:
     def __init__(self):
         self.server = ""
         self.username = ""
@@ -13,11 +13,22 @@ class MainGame():
         self.menu = Menu(self)
 
     def join_server(self):
-        self.server = Client(self)
-        self.server.join()
+        serverconnection = Client(self)
+        serverconnection.join()
+        self.menu.close()
+        self.game_loop()
 
 
-class Menu():
+    def game_loop(self):
+        running = True
+        while running:
+            command = input()
+            serverconnection = Client(self)
+            print("p")
+            serverconnection.send(command)
+
+
+class Menu:
     def __init__(self, maingame):
         self.maingame = maingame
         self.done = False
@@ -103,16 +114,17 @@ class Menu():
             self.widgets["chr_ln"].resize(50, 50)
             self.widgets["chr_ln"].setStyleSheet("font-size: 25pt")
 
-            self.widgets["server_lbl"] = QtWidgets.QLabel(self)
-            self.widgets["server_lbl"].setText("Server:")
-            self.widgets["server_lbl"].setStyleSheet("font-size: 10pt")
-            self.widgets["server_lbl"].move(10, 240)
-            self.widgets["server_lbl"].resize(500, 20)
+            if False:
+                self.widgets["server_lbl"] = QtWidgets.QLabel(self)
+                self.widgets["server_lbl"].setText("Server:")
+                self.widgets["server_lbl"].setStyleSheet("font-size: 10pt")
+                self.widgets["server_lbl"].move(10, 240)
+                self.widgets["server_lbl"].resize(500, 20)
 
-            self.widgets["server_ln"] = QtWidgets.QLineEdit(self)
-            self.widgets["server_ln"].move(10, 260)
-            self.widgets["server_ln"].resize(200, 30)
-            self.widgets["server_ln"].setStyleSheet("font-size: 10pt")
+                self.widgets["server_ln"] = QtWidgets.QLineEdit(self)
+                self.widgets["server_ln"].move(10, 260)
+                self.widgets["server_ln"].resize(200, 30)
+                self.widgets["server_ln"].setStyleSheet("font-size: 10pt")
 
             self.widgets["finish_btn"] = QtWidgets.QPushButton(self)
             self.widgets["finish_btn"].move(60, 320)
@@ -126,14 +138,14 @@ class Menu():
         def submit(self):
             self.username = self.widgets["username_ln"].text()
             self.chr = self.widgets["chr_ln"].text()
-            self.servercode = self.widgets["server_ln"].text()
+            #self.servercode = self.widgets["server_ln"].text()
 
             self.pass_information()
 
         def pass_information(self):
             self.maingame.username = self.username
             self.maingame.chr = self.chr
-            self.maingame.servercode = self.servercode
+            #self.maingame.servercode = self.servercode
 
             self.maingame.join_server()
 
@@ -186,8 +198,9 @@ class Client:
         return (result_string)
 
     def join(self):
-        joincommand = "j"+ "." + self.maingame.servercode + "." + self.maingame.username
+        joincommand = "j"+ "." + self.maingame.username
         self.send(joincommand)
+
 
 class Coord(QtWidgets.QPushButton):
     def __init__(self, parent):
@@ -198,9 +211,9 @@ class Coord(QtWidgets.QPushButton):
     def set_text(self,text):
         self.setText(text)
         chrcount = str(int(200 / len(text)))
-        print(chrcount)
         self.setStyleSheet("font-size: "+chrcount+"pt ;")
         # This will set the text, and resize it appropriatly
+
 
 def main():
     app = QtWidgets.QApplication(argv)
