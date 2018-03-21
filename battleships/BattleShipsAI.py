@@ -170,6 +170,7 @@ class Coord(QtWidgets.QPushButton):
         if self.shown_value == " ":
             self.setStyleSheet("font-size: 30pt; background-color: #EEEEEE")
 
+
 def main():
     app = QtWidgets.QApplication(sys.argv)
     game = MainGame()
