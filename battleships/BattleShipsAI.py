@@ -138,6 +138,7 @@ class Coord(QtWidgets.QPushButton):
         super(Coord, self).__init__(parent)
         self.hidden_value = " "
         self.shown_value = " "
+        self.styleSheet = " "
         self.acceptable_values = ["x", "X", "O", "•", "═", "║", " "]
 
     def set_color(self, color):
@@ -156,8 +157,18 @@ class Coord(QtWidgets.QPushButton):
             self.shown_value = "?"
         else:
             self.shown_value = self.hidden_value
+
         self.setText(self.shown_value)
         self.setStyleSheet("font-size: 30pt")
+
+        #Setting board Colors
+
+        if self.shown_value == "•":
+            self.setStyleSheet("font-size: 30pt; background-color: #3333DD")
+        if self.shown_value == "x":
+            self.setStyleSheet("font-size: 30pt; background-color: #EE1111")
+        if self.shown_value == " ":
+            self.setStyleSheet("font-size: 30pt; background-color: #EEEEEE")
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
