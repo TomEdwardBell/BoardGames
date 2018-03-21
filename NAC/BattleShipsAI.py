@@ -7,6 +7,7 @@ class MainGame:
     def __init__(self):
         print("Game Initialising...")
         self.ui = Grid()
+        self.clicks = 0
         self.set_boats()
         self.set_slots()
         self.ui.show()
@@ -77,7 +78,8 @@ class MainGame:
             self.ui.board[x, y].set_value("x")
             self.checkwon()
         elif self.ui.board[x, y].hidden_value == "•":
-            self.ui.board[x, y].set_value("O")
+            self.ui.board[x, y].set_value(" ")
+        self.clicks += 1
 
     def checkwon(self):
         won = True
@@ -87,9 +89,8 @@ class MainGame:
                     won = False
 
         if won:
-            print("WON")
+            print("WON", self.clicks)
             self.ui.win()
-            print("DONE WIINNING GAME OVER")
 
 
 class Grid(QtWidgets.QMainWindow):
@@ -116,9 +117,6 @@ class Grid(QtWidgets.QMainWindow):
                 yloc = (y*ypercoord + (y+1)*border)
                 self.board[x, y].move(xloc, yloc)
                 self.board[x, y].resize(boardx/xcount, boardy/ycount)
-
-    def doturn(self, coordnumbers):
-        pass
 
     def print_coord(self, coord):
         print(coord.coordinates)
