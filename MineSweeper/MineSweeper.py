@@ -207,7 +207,6 @@ class Coord(QtWidgets.QPushButton):
         self.setText(str(self.shown_value))
 
 
-
 def main():
     app = QtWidgets.QApplication(sys.argv)
     game = MainGame()
