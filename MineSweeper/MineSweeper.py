@@ -7,8 +7,8 @@ class MainGame:
     def __init__(self):
         print("Game Initialising...")
         self.clicks = 0
-        self.mine_count = 9
-        self.dimensions = (10, 10)
+        self.mine_count = 50
+        self.dimensions = (25, 25)
         self.ui = Grid(self.dimensions)
         self.set_mines()
         self.set_slots()
@@ -98,7 +98,8 @@ class MainGame:
         print("DEAD")
         for x in range(self.dimensions[0]):
             for y in range(self.dimensions[1]):
-                self.ui.board[x, y].setStyleSheet("background-color: #FF0000; font-size: 50pt")
+                self.ui.board[x, y].die()
+        self.mouse_mode = "dead"
 
 
 class Grid(QtWidgets.QMainWindow):
@@ -110,8 +111,8 @@ class Grid(QtWidgets.QMainWindow):
         self.init_ui()
 
     def init_ui(self):
-        boardx = 512
-        boardy = 512
+        boardx = 800
+        boardy = 800
         margintop = 60
         borderx = 0
         bordery = 0
@@ -168,7 +169,7 @@ class Coord(QtWidgets.QPushButton):
         self.color_numbers = {
             0: "#333333",
             1: "#DD1111",
-            2: "#55EE11",
+            2: "#DDDD11",
             3: "#11EE22",
             4: "#1155FF",
             5: "#EE00EE",
@@ -187,12 +188,14 @@ class Coord(QtWidgets.QPushButton):
         self.setStyleSheet("background-color:" + color)
 
     def set_value(self, tochangeto):
+        fontsize = str(int(self.width() + self.height() * 0.02))
+        print(fontsize)
         if tochangeto == "x":
             self.hidden_value = tochangeto
             self.shown_value = " "
         elif tochangeto == "F":
             self.shown_value = "F"
-            self.setStyleSheet("font-size: 40pt; color: #551111")
+            self.setStyleSheet("font-size: "+fontsize+"px; color: #551111")
         elif tochangeto in [0, 1, 2, 3, 4, 5, 6, 7, 8]:
             if self.state == "hidden":
                 self.shown_value = " "
@@ -200,11 +203,17 @@ class Coord(QtWidgets.QPushButton):
             if self.state == "shown":
                 fontcolor = self.color_numbers[tochangeto]
                 self.shown_value = tochangeto
-                self.setStyleSheet("font-size: 30pt; color: " + fontcolor)
+                self.setStyleSheet("font-size: "+fontsize+"px; color: " + fontcolor)
 
             self.hidden_value = tochangeto
 
         self.setText(str(self.shown_value))
+
+    def die(self):
+        fontsize = str(int(self.width() + self.height() * 0.02))
+        if self.hidden_value == "x":
+            self.setText("X")
+            self.setStyleSheet("font-size:"+fontsize+"px; color: #000000; background-color: #FF0000")
 
 
 def main():
