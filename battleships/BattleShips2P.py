@@ -6,98 +6,21 @@ import random
 class MainGame:
     def __init__(self):
         print("Game Initialising...")
-        self.ui = Grid()
+        self.boards = []
+        self.boards.append(Grid(1))
+        self.boards.append(Grid(2))
         self.clicks = 0
-        self.set_boats()
-        self.set_slots()
-        self.ui.show()
-
-    def set_boats(self):
-        shipslist = [[5,"Aircraft carrier"], [4,"Battleship"],[3,"Cruiser"],[3,"Submarine"],[2,"Destroyer"]]
-        for x in range(10):
-            for y in range(10):
-                self.ui.board[x, y].set_value("•")  # Sets blank board
-
-        random.shuffle(shipslist)  # Randomising order of setting ships
-        for ship in shipslist:  # For every ship
-            shipplaced = False  # Validation shizzle
-            while not shipplaced:
-                shipplaced = True
-                shipdirection = random.choice(["H","V"])  # Randomly makes a ship verticle or horizontal
-                shiplength = ship[0]  #Ship has a length then a name
-
-                shiporigin = [random.randint(0, 9), random.randint(0, 9)]
-                # Randomly sets an "origin point" for each boat
-                # Even if it's ivalid (that gets sortedlater)
-
-                if shipdirection == "H":
-                    if shiporigin[0] + shiplength > 9: # If its to long
-                        shipplaced = False
-
-                if shipdirection == "V":
-                    if shiporigin[1] + shiplength > 9: # If it's too long
-                        shipplaced = False
-
-                if shipplaced == True:
-                    if shipdirection == "H": # Collision detection
-                        for i in range(shiplength):
-                            if self.ui.board[shiporigin[0] + i, shiporigin[1]].hidden_value != "•":
-                                # All of the pieces it's replacing must be blank
-                                shipplaced = False
-
-                    if shipdirection == "V": # Collision detection
-                        for i in range(shiplength - 1):
-                            if self.ui.board[shiporigin[0], shiporigin[1] + i].hidden_value != "•":
-                                # All of the pieces it's replacing must be blank
-                                shipplaced = False
-
-
-            # If ship placed is true
-            if shipdirection == "H":
-                for a in range(shiplength):
-                    self.ui.board[shiporigin[0] + a, shiporigin[1]].set_value("═")
-                    # Pieces now set
-
-            if shipdirection == "V":
-                for a in range(shiplength):
-                    self.ui.board[shiporigin[0], shiporigin[1] + a].set_value("║")
-                    # Pieces now set
-
-        # End of that massive method (ugh)
-
-    def set_slots(self):
-        for x in range(10):
-            for y in range(10):
-                self.ui.board[x, y].clicked.connect(lambda state, c=(x, y): self.clicked(c))
-
-    def clicked(self, coords):
-        x = coords[0]
-        y = coords[1]
-
-        if self.ui.board[x, y].hidden_value == "║" or self.ui.board[x, y].hidden_value == "═":
-            self.ui.board[x, y].set_value("x")
-            self.checkwon()
-        elif self.ui.board[x, y].hidden_value == "•":
-            self.ui.board[x, y].set_value(" ")
-        self.clicks += 1
-
-    def checkwon(self):
-        won = True
-        for x in range(10):
-            for y in range(10):
-                if self.ui.board[x, y].hidden_value == "═" or self.ui.board[x, y].hidden_value == "║":
-                    won = False
-
-        if won:
-            print("WON", self.clicks)
-            self.ui.win()
 
 
 class Grid(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, player_number):
         super(Grid, self).__init__()
         self.board = {}
         self.init_ui()
+        self.player_number = player_number
+        self.set_slots()
+
+        self.show()
 
     def init_ui(self):
         boardx = 650
@@ -138,6 +61,88 @@ class Grid(QtWidgets.QMainWindow):
                     ''')
 
 
+    def set_boats(self):
+        shipslist = [[5,"Aircraft carrier"], [4,"Battleship"],[3,"Cruiser"],[3,"Submarine"],[2,"Destroyer"]]
+        for x in range(10):
+            for y in range(10):
+                self.ui.board[x, y].set_value("•")  # Sets blank board
+
+        random.shuffle(shipslist)  # Randomising order of setting ships
+        for ship in shipslist:  # For every ship
+            shipplaced = False  # Validation shizzle
+            while not shipplaced:
+                shipplaced = True
+                shipdirection = random.choice(["H","V"])  # Randomly makes a ship verticle or horizontal
+                shiplength = ship[0]  #Ship has a length then a name
+
+
+                shiporigin = [random.randint(0, 9), random.randint(0, 9)]
+                # Randomly sets an "origin point" for each boat
+                # Even if it's invalid (that gets sorted later)
+
+                if shipdirection == "H":
+                    if shiporigin[0] + shiplength > 9: # If its to long
+                        shipplaced = False
+
+                if shipdirection == "V":
+                    if shiporigin[1] + shiplength > 9: # If it's too long
+                        shipplaced = False
+
+                if shipplaced == True:
+                    if shipdirection == "H": # Collision detection
+                        for i in range(shiplength):
+                            if self.ui.board[shiporigin[0] + i, shiporigin[1]].hidden_value != "•":
+                                # All of the pieces it's replacing must be blank
+                                shipplaced = False
+
+                    if shipdirection == "V": # Collision detection
+                        for i in range(shiplength - 1):
+                            if self.ui.board[shiporigin[0], shiporigin[1] + i].hidden_value != "•":
+                                # All of the pieces it's replacing must be blank
+                                shipplaced = False
+
+
+            # If ship placed is true
+            if shipdirection == "H":
+                for a in range(shiplength):
+                    self.ui.board[shiporigin[0] + a, shiporigin[1]].set_value("═")
+                    # Pieces now set
+
+            if shipdirection == "V":
+                for a in range(shiplength):
+                    self.ui.board[shiporigin[0], shiporigin[1] + a].set_value("║")
+                    # Pieces now set
+
+        # End of that massive method (ugh)
+
+    def set_slots(self):
+        for x in range(10):
+            for y in range(10):
+                self.board[x, y].clicked.connect(lambda state, c=(x, y): self.clicked(c))
+
+    def clicked(self, coords):
+        x = coords[0]
+        y = coords[1]
+
+        if self.board[x, y].hidden_value == "║" or self.board[x, y].hidden_value == "═":
+            self.board[x, y].set_value("x")
+            self.checkwon()
+        elif self.board[x, y].hidden_value == "•":
+            self.board[x, y].set_value(" ")
+        self.clicks += 1
+
+    def checkwon(self):
+        won = True
+        for x in range(10):
+            for y in range(10):
+                if self.board[x, y].hidden_value == "═" or self.board[x, y].hidden_value == "║":
+                    won = False
+
+        if won:
+            print("WON", self.clicks)
+            self.win()
+
+
 class Coord(QtWidgets.QPushButton):
     def __init__(self, parent):
         super(Coord, self).__init__(parent)
@@ -174,6 +179,9 @@ class Coord(QtWidgets.QPushButton):
             self.setStyleSheet("font-size: 30pt; background-color: #EE1111")
         if self.shown_value == " ":
             self.setStyleSheet("font-size: 30pt; background-color: #EEEEEE")
+
+
+
 
 
 def main():
