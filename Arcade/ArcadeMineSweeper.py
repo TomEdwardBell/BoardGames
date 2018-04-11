@@ -7,8 +7,8 @@ class MainGame:
     def __init__(self):
         print("Game Initialising...")
         self.clicks = 0
-        self.mine_count = 5
-        self.dimensions = (20, 20)
+        self.mine_count = 10
+        self.dimensions = (6, 6)
         self.ui = Grid(self.dimensions)
         self.set_mines()
         self.set_slots()
@@ -16,11 +16,11 @@ class MainGame:
         self.ui.show()
         print("Game Loaded")
 
+
+
     def set_mines(self):
         for i in range(self.mine_count):
             mine_placed = False
-            mine_x = 0
-            mine_y = 0  # This line and the one above just make PyCharm happier
             while not mine_placed:
                 mine_placed = True
                 mine_x = random.randint(0, self.dimensions[0] - 1)
@@ -38,42 +38,33 @@ class MainGame:
         self.ui.widgets["flag_btn"].clicked.connect(self.flag_switch)
 
     def clicked(self, coords, realclick):
-        x, y = coords
-        ignore_realclick = False
-
-        if self.mouse_mode == "flag" and not self.ui.board[x, y].been_clicked:
+        x = coords[0]
+        y = coords[1]
+        if self.mouse_mode == "flag":
+            if self.ui.board[x, y].state == "hidden":
                 if self.ui.board[x, y].shown_value == " ":
                     self.ui.board[x, y].set_value("F")
-                    ignore_realclick = True
                 elif self.ui.board[x, y].shown_value == "F":
-                    self.ui.board[x, y].set_value("/F")
-                    ignore_realclick = False
+                    self.ui.board[x, y].set_value(" ")
 
-        elif self.mouse_mode == "normal" and not self.ui.board[x, y].been_clicked:
-            ignore_realclick = True
+        elif self.mouse_mode == "normal":
             if self.ui.board[x, y].shown_value != "F":  # Makes sure it's not flagged. No accidental clicking!
-                ignore_realclick = False
-
-                if not self.ui.board[x, y].been_clicked:
-                    self.ui.board[x, y].been_clicked = True
-
+                if self.ui.board[x, y].state == "hidden":
+                    self.ui.board[x, y].state = "shown"
                 if self.ui.board[x, y].hidden_value == "x":
-                    ignore_realclick = True
                     self.game_over()
-
                 else:
                     minecount = self.get_minecount(coords)
                     self.ui.board[x, y].set_value(minecount)
-                    self.ui.board[x, y].been_clicked = True
-
                     if minecount == 0:  # The thing where if you click one of "0" it also removes the other nearby 0s
-                        for loc_x, loc_y in self.get_locals((x, y)):  # Gets local coords
-                            if not self.ui.board[loc_x, loc_y].been_clicked:  # If they've not been clicked
-                                self.clicked((loc_x, loc_y), False)  # Oh sorry, is that recursion
+                        for local_coord in self.get_locals((x, y)): # Gets local coords
+                            loc_x = local_coord[0]
+                            loc_y = local_coord[1]
+                            if self.ui.board[loc_x, loc_y].state == "hidden":  # If they've not been clicked
+                                self.clicked((local_coord[0], local_coord[1]), False)  # Oh sorry, is that recursion
                                 # HELL YEAH IT IS!!!
                                 # No but that command basically will click the nearby coord for you.
-
-            if realclick and not ignore_realclick:
+            if realclick:
                 self.clicks += 1
                 self.ui.widgets["clicks_lbl"].setText("Clicks: "+str(self.clicks))
 
@@ -115,11 +106,8 @@ class MainGame:
         won = True
         for coordnum in self.ui.board:
             coord = self.ui.board[coordnum]
-            if coord.hidden_value == "x" and coord.shown_value != "F":  # If you haven't found every bomb and marked it
-                won = False  # You lose
-
-            if coord.hidden_value != "x" and coord.shown_value == "F":  # If you marked a piece that isn't a bomb
-                won = False  # You lose
+            if coord.hidden_value == "x" and coord.shown_value != "F":
+                won = False
 
         if won:
             self.mouse_mode = "won"
@@ -144,8 +132,8 @@ class Grid(QtWidgets.QMainWindow):
         self.init_ui()
 
     def init_ui(self):
-        boardx = 850
-        boardy = 850
+        boardx = 800
+        boardy = 800
         margintop = 60
         borderx = 0
         bordery = 0
@@ -180,11 +168,26 @@ class Grid(QtWidgets.QMainWindow):
                 self.board[x, y].resize(boardx/xcount, boardy/ycount)
                 self.board[x, y].set_font_size()
 
+    def win(self):
+        for x in range(10):
+            for y in range(10):
+                toerase = ["•", "O", " "]
+                if self.board[x, y].hidden_value in toerase:
+                    self.board[x, y].set_value(" ")
+                    self.board[x, y].setStyleSheet('''
+                    font-size: 35pt;
+                    background-color: #22FF11;
+                    ''')
+                else:
+                    self.board[x, y].setStyleSheet('''
+                    background-color: #FFFFFF;
+                    font-size: 35pt;
+                    ''')
+
 
 class Coord(QtWidgets.QPushButton):
     def __init__(self, parent):
         super(Coord, self).__init__(parent)
-        self.been_clicked = False
         self.hidden_value = " "
         self.shown_value = " "
         self.font_size = "10"
@@ -199,6 +202,7 @@ class Coord(QtWidgets.QPushButton):
             7: "#EE6600",
             8: "#6611AA"
         }
+        self.state = "hidden"  # Hidden or shown, depends on whether it's been clicked
 
     def set_font_size(self):
         self.font_size = ((self.height() + self.width())**1.3) * 0.1
@@ -213,29 +217,25 @@ class Coord(QtWidgets.QPushButton):
         self.setStyleSheet("background-color:" + color)
 
     def set_value(self, tochangeto):
-        nochange = self.hidden_value
-        processing = {
-            # Input character: (Shown value, hidden value, stylesheet, self.been_clicked)
-            "x": (" ", "x", " ", False),
-            "F": ("F", nochange, ("font-size: "+self.font_size+"px; color: #DDDDDD; background-color: #5555DD"), False),
-            "/F": (" ", nochange, " ", False),
-            " ": (" ", " ", False),
-            0: (0, nochange, ("font-size: "+self.font_size+"px; color: " + self.color_numbers[0]), True),
-            1: (1, nochange, ("font-size: "+self.font_size+"px; color: " + self.color_numbers[1]), True),
-            2: (2, nochange, ("font-size: "+self.font_size+"px; color: " + self.color_numbers[2]), True),
-            3: (3, nochange, ("font-size: "+self.font_size+"px; color: " + self.color_numbers[3]), True),
-            4: (4, nochange, ("font-size: "+self.font_size+"px; color: " + self.color_numbers[4]), True),
-            5: (5, nochange, ("font-size: "+self.font_size+"px; color: " + self.color_numbers[5]), True),
-            6: (6, nochange, ("font-size: "+self.font_size+"px; color: " + self.color_numbers[6]), True),
-            7: (7, nochange, ("font-size: "+self.font_size+"px; color: " + self.color_numbers[7]), True),
-            8: (8, nochange, ("font-size: "+self.font_size+"px; color: " + self.color_numbers[8]), True),
-        }
+        if tochangeto == "x":
+            self.hidden_value = tochangeto
+            self.shown_value = " "
+        elif tochangeto == "F":
+            self.shown_value = "F"
+            self.setStyleSheet("font-size: "+self.font_size+"px; color: #DDDDDD; background-color: #5555DD")
+        elif tochangeto in [0, 1, 2, 3, 4, 5, 6, 7, 8]:
+            if self.state == "hidden":
+                self.shown_value = " "
 
-        newvalues = processing.get(tochangeto, ("?", "?", ""))
-        self.shown_value = newvalues[0]
-        self.hidden_value = newvalues[1]
-        self.setStyleSheet(newvalues[2])
-        self.been_clicked = newvalues[3]
+            if self.state == "shown":
+                fontcolor = self.color_numbers[tochangeto]
+                self.shown_value = tochangeto
+                self.setStyleSheet("font-size: "+self.font_size+"px; color: " + fontcolor)
+        elif tochangeto == " ":
+            self.shown_value = " "
+            self.setStyleSheet("font-size: "+self.font_size+"px")
+
+            self.hidden_value = tochangeto
 
         self.setText(str(self.shown_value))
 
@@ -260,6 +260,4 @@ def main():
     game = MainGame()
     app.exec_()
 
-
-if __name__ == '__main__':
-    main()
+start_game = main
