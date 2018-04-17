@@ -50,11 +50,11 @@ class MainGame:
                 # Even if it's ivalid (that gets sortedlater)
 
                 if shipdirection == "H":
-                    if shiporigin[0] + shiplength > self.options.grid_size[0] - 1: # If its to long
+                    if shiporigin[0] + shiplength > self.options.grid_size[0]: # If its to long
                         shipplaced = False
 
                 if shipdirection == "V":
-                    if shiporigin[1] + shiplength > self.options.grid_size[1] - 1: # If it's too long
+                    if shiporigin[1] + shiplength > self.options.grid_size[1]: # If it's too long
                         shipplaced = False
 
                 if shipplaced == True:
@@ -149,7 +149,7 @@ class Grid(QtWidgets.QMainWindow):
                     self.board[x, y].set_value(" ")
                     self.board[x, y].setStyleSheet('''
                     font-size: 35pt;
-                    background-color: #22FF11;
+                    background-color: #22DD11;
                     ''')
                 else:
                     self.board[x, y].setStyleSheet('''

@@ -7,7 +7,7 @@ class Options:
         self.window_size = (500, 500)
         # ^ Size of the window
 
-        self.piece_border = 5
+        self.piece_border = 30
         # ^ Border between each of the pieces
 
         self.players = ["X", "O"]

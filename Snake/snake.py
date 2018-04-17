@@ -1,6 +1,5 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from sys import argv
-import datetime
 import random
 
 
@@ -11,7 +10,15 @@ class Options:  # Use this to change the options
         #   Anything less than 20 doesn't work very well
         #   Anything over 300 doesn't work very well
 
-        self.board_size = (20, 20)
+        self.speed_up_with_size = 4
+        # ^ Allows you to speed up as you get longer
+        #   Set as 1 to ignore this effect
+        #   The lower the number the more it accelerates
+        #   Keep this number between 0.8 and 1 (or otherwise it's very extreme)
+        #   Anything over 1 will slow down as you get longer
+
+
+        self.board_size = (30, 30)
         # ^ Size of the grid (width, height)
 
         self.window_size = (500, 500)
@@ -80,9 +87,10 @@ class MainGame:
             tick_count += 1
             if self.timer_available:
                 self.timer_available = False
+                tick_speed = self.options.tick_speed * (self.options.speed_up_with_size ** (len(self.snakes) - 1))
                 timer = QtCore.QTimer()
                 timer.timeout.connect(self.main_loop_timer_done)
-                timer.start(self.options.tick_speed)
+                timer.start(tick_speed)
             QtGui.QGuiApplication.processEvents()
 
     def main_loop_timer_done(self):
@@ -111,7 +119,7 @@ class MainGame:
         if self.snakes[0].x + self.direction[0] < 0:
             newx = self.ui.grid_size[0] - 1
         if self.snakes[0].y + self.direction[1] < 0:
-            newy = self.ui.grid_size[0] - 1
+            newy = self.ui.grid_size[1] - 1
         return(newx, newy)
 
     def remove_last_piece(self):

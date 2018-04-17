@@ -4,7 +4,7 @@ import random
 
 class Options():
     def __init__(self):
-        self.grid_size = (10, 10)
+        self.grid_size = (20, 20)
         # ^ Grid size
         #   (Width, Height)
 
@@ -12,7 +12,7 @@ class Options():
         # ^ Window size
         #   Pixels
 
-        self.mine_count = 10
+        self.mine_count = 30
         # ^ Number of mines on the board
 
 
