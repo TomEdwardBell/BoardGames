@@ -2,6 +2,11 @@ from PyQt5 import QtWidgets
 from sys import argv
 import random
 
+class Options: # Use this to change the options
+    def __init__(self):
+        self.grid_size = (10, 10)
+        self.window_size = (400, 400)
+        # ^ Window Size (pixels)
 
 class MainGame:
     def __init__(self):
@@ -27,15 +32,15 @@ class MainGame:
 class Grid(QtWidgets.QMainWindow):
     def __init__(self):
         super(Grid, self).__init__()
-
+        self.options = Options()
         self.board = {}
         self.widgets = {}
 
-        self.window_size = (0, 0)
-        self.grid_size = (0, 0)
+        self.window_size = self.options.window_size
+        self.grid_size = self.options.grid_size
 
-        self.margin = (0, 0, 0, 0) #Top margin, Bottom margin, Left Margin, Right Margin
-        self.borders =(0 ,0)
+        self.margin = (0, 0, 0, 0) # Top margin, Bottom margin, Left Margin, Right Margin
+        self.borders = (0, 0)
 
     def init_ui(self):
         boardx , boardy = self.window_size

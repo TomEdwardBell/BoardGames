@@ -1,13 +1,4 @@
-x = ["a", "b", "c"]
-y = ["a", "b", "c"]
-z = x
+choices = ["a", "b", "c", "d", "e"]
 
-print(x == y)
-print(x == z)
-print(y == z)
-
-print("----")
-
-print(x is y)
-print(x is z)
-print(y is z)
+print(choices[0])
+print(choices[0:2])

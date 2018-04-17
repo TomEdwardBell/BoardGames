@@ -2,20 +2,37 @@ from PyQt5 import QtWidgets, QtTest
 import sys
 import random
 
+class Options:
+    def __init__(self):
+        self.window_size = (500, 500)
+        # ^ Window size
+        #   (width / height)
+        #   Pixels
+
+        self.grid_size = (10, 10)
+        # ^ Grid size
+
+        self.ships_list = [[5,"Aircraft carrier"], [4,"Battleship"],[3,"Cruiser"],[3,"Submarine"],[2,"Destroyer"]]
+        # ^ Each ship
+        #   Length, then name
+        #   Make sure lengths are less than the grid size
+
 
 class MainGame:
     def __init__(self):
         print("Game Initialising...")
         self.ui = Grid()
+        self.options = Options()
+
         self.clicks = 0
         self.set_boats()
         self.set_slots()
         self.ui.show()
 
     def set_boats(self):
-        shipslist = [[5,"Aircraft carrier"], [4,"Battleship"],[3,"Cruiser"],[3,"Submarine"],[2,"Destroyer"]]
-        for x in range(10):
-            for y in range(10):
+        shipslist = self.options.ships_list
+        for x in range(self.options.grid_size[0]):
+            for y in range(self.options.grid_size[1]):
                 self.ui.board[x, y].set_value("•")  # Sets blank board
 
         random.shuffle(shipslist)  # Randomising order of setting ships
@@ -26,16 +43,18 @@ class MainGame:
                 shipdirection = random.choice(["H","V"])  # Randomly makes a ship verticle or horizontal
                 shiplength = ship[0]  #Ship has a length then a name
 
-                shiporigin = [random.randint(0, 9), random.randint(0, 9)]
+                shiporiginx = random.randint(0, self.options.grid_size[0] - 1)
+                shiporiginy = random.randint(0, self.options.grid_size[1] - 1)
+                shiporigin = [shiporiginx , shiporiginy]
                 # Randomly sets an "origin point" for each boat
                 # Even if it's ivalid (that gets sortedlater)
 
                 if shipdirection == "H":
-                    if shiporigin[0] + shiplength > 9: # If its to long
+                    if shiporigin[0] + shiplength > self.options.grid_size[0] - 1: # If its to long
                         shipplaced = False
 
                 if shipdirection == "V":
-                    if shiporigin[1] + shiplength > 9: # If it's too long
+                    if shiporigin[1] + shiplength > self.options.grid_size[1] - 1: # If it's too long
                         shipplaced = False
 
                 if shipplaced == True:
@@ -66,8 +85,8 @@ class MainGame:
         # End of that massive method (ugh)
 
     def set_slots(self):
-        for x in range(10):
-            for y in range(10):
+        for x in range(self.options.grid_size[0]):
+            for y in range(self.options.grid_size[0]):
                 self.ui.board[x, y].clicked.connect(lambda state, c=(x, y): self.clicked(c))
 
     def clicked(self, coords):
@@ -83,8 +102,8 @@ class MainGame:
 
     def checkwon(self):
         won = True
-        for x in range(10):
-            for y in range(10):
+        for x in range(self.options.grid_size[0]):
+            for y in range(self.options.grid_size[1]):
                 if self.ui.board[x, y].hidden_value == "═" or self.ui.board[x, y].hidden_value == "║":
                     won = False
 
@@ -96,15 +115,16 @@ class MainGame:
 class Grid(QtWidgets.QMainWindow):
     def __init__(self):
         super(Grid, self).__init__()
+        self.options = Options()
         self.board = {}
         self.init_ui()
 
     def init_ui(self):
-        boardx = 650
-        boardy = 650
+        boardx = self.options.window_size[0]
+        boardy = self.options.window_size[1]
         border = 0
-        xcount = 10
-        ycount = 10
+        xcount = self.options.grid_size[0]
+        ycount = self.options.grid_size[1]
 
         self.resize(boardx + border * (xcount + 1), boardy + border * (xcount + 1))
         for x in range(xcount):
@@ -122,8 +142,8 @@ class Grid(QtWidgets.QMainWindow):
         print(coord.coordinates)
 
     def win(self):
-        for x in range(10):
-            for y in range(10):
+        for x in range(self.options.grid_size[0]):
+            for y in range(self.options.grid_size[1]):
                 toerase = ["•", "O", " "]
                 if self.board[x, y].hidden_value in toerase:
                     self.board[x, y].set_value(" ")

@@ -2,14 +2,28 @@ from PyQt5 import QtWidgets
 from sys import argv
 import random
 
+class Options():
+    def __init__(self):
+        self.grid_size = (10, 10)
+        # ^ Grid size
+        #   (Width, Height)
+
+        self.window_size = (800, 800)
+        # ^ Window size
+        #   Pixels
+
+        self.mine_count = 10
+        # ^ Number of mines on the board
+
 
 class MainGame:
     def __init__(self):
         print("Game Initialising...")
+        self.options = Options()
+
         self.clicks = 0
-        self.mine_count = 5
-        self.dimensions = (20, 20)
-        self.ui = Grid(self.dimensions)
+        self.mine_count = self.options.mine_count
+        self.ui = Grid()
         self.set_mines()
         self.set_slots()
         self.mouse_mode = "normal"
@@ -23,8 +37,8 @@ class MainGame:
             mine_y = 0  # This line and the one above just make PyCharm happier
             while not mine_placed:
                 mine_placed = True
-                mine_x = random.randint(0, self.dimensions[0] - 1)
-                mine_y = random.randint(0, self.dimensions[1] - 1)
+                mine_x = random.randint(0, self.options.grid_size[0] - 1)
+                mine_y = random.randint(0, self.options.grid_size[1] - 1)
 
                 if self.ui.board[mine_x, mine_y].hidden_value == "x":
                     mine_placed = False
@@ -32,8 +46,8 @@ class MainGame:
             self.ui.board[mine_x, mine_y].set_value("x")
 
     def set_slots(self):
-        for x in range(self.dimensions[0]):
-            for y in range(self.dimensions[1]):
+        for x in range(self.options.grid_size[0]):
+            for y in range(self.options.grid_size[1]):
                 self.ui.board[x, y].clicked.connect(lambda state, c=(x, y): self.clicked(c, True))
         self.ui.widgets["flag_btn"].clicked.connect(self.flag_switch)
 
@@ -96,7 +110,7 @@ class MainGame:
             rel_y = i[1]
             loc_x = coords[0] + rel_x
             loc_y = coords[1] + rel_y
-            if -1 not in [loc_x, loc_y] and loc_x < self.dimensions[0] and loc_y < self.dimensions[1]:
+            if -1 not in [loc_x, loc_y] and loc_x < self.options.grid_size[0] and loc_y < self.options.grid_size[1]:
                 localcoords.append([loc_x, loc_y])
         return(localcoords)
 
@@ -129,28 +143,31 @@ class MainGame:
 
     def game_over(self):
         print("DEAD")
-        for x in range(self.dimensions[0]):
-            for y in range(self.dimensions[1]):
+        for x in range(self.options.grid_size[0]):
+            for y in range(self.options.grid_size[1]):
                 self.ui.board[x, y].die()
         self.mouse_mode = "dead"
 
 
 class Grid(QtWidgets.QMainWindow):
-    def __init__(self, dimensions):
+    def __init__(self):
         super(Grid, self).__init__()
-        self.dimensions = dimensions
+        self.options = Options()
+
+        self.grid_size = self.options.grid_size
+        self.window_size = self.options.window_size
         self.board = {}
         self.widgets = {}
         self.init_ui()
 
     def init_ui(self):
-        boardx = 850
-        boardy = 850
+        boardx = self.window_size[0]
+        boardy = self.window_size[1]
         margintop = 60
         borderx = 0
         bordery = 0
-        xcount = self.dimensions[0]
-        ycount = self.dimensions[1]
+        xcount = self.grid_size[0]
+        ycount = self.grid_size[1]
 
         self.widgets["flag_btn"] = QtWidgets.QPushButton(self)
         self.widgets["flag_btn"].setText("Change Mouse Mode")

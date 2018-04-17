@@ -2,6 +2,18 @@ from PyQt5 import QtWidgets, QtTest
 import sys
 import random
 
+class Options:
+    def __init__(self):
+        self.window_size = (500, 500)
+        # ^ Size of the window
+
+        self.piece_border = 5
+        # ^ Border between each of the pieces
+
+        self.players = ["X", "O"]
+        #  Choose the two characters the players use
+        #  Keep this list 2 long!!
+
 
 class Coord:
     def __init__(self, game):
@@ -25,15 +37,16 @@ class Coord:
 class Grid(QtWidgets.QMainWindow):
     def __init__(self):
         super(Grid, self).__init__()
-        self.currentturn = "O"  # "X" or "O"
+        self.options = Options()
+
+        self.currentturn = self.options.players[1]  # "X" or "O"
         self.board = {}
         self.won = False
         self.initUI()
 
     def initUI(self):
-        boardx = 650
-        boardy = 650
-        border = 0
+        boardx,  boardy = self.options.window_size
+        border = self.options.piece_border
         xcount = 3
         ycount = 3
 
@@ -57,10 +70,10 @@ class Grid(QtWidgets.QMainWindow):
     def doturn(self, coordnumbers):
         nextturn = ""
         if self.board[coordnumbers].value == " " and self.won == False:
-            if self.currentturn == "O":
-                nextturn = "X"
-            if self.currentturn == "X":
-                nextturn = "O"
+            if self.currentturn == self.options.players[1]:
+                nextturn = self.options.players[0]
+            if self.currentturn == self.options.players[0]:
+                nextturn = self.options.players[1]
 
             self.currentturn = nextturn
             self.board[(coordnumbers[0],coordnumbers[1])].setValue(self.currentturn)
@@ -81,7 +94,7 @@ class Grid(QtWidgets.QMainWindow):
         ]
         wonyet = False
         drawn = True
-        for player in ["O", "X"]:
+        for player in self.options.players:
             for winningboard in possiblewins:
                 wonyet = True
                 for coord in winningboard:
