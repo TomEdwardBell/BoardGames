@@ -5,23 +5,22 @@ import random
 
 class Options:  # Use this to change the options
     def __init__(self):
-        self.tick_speed = 100
+        self.tick_speed = 80
         # ^ Amount of time between each snake move (milliseconds)
         #   Anything less than 20 doesn't work very well
         #   Anything over 300 doesn't work very well
 
-        self.speed_up_with_size = 4
+        self.speed_up_with_size = 0.7
         # ^ Allows you to speed up as you get longer
         #   Set as 1 to ignore this effect
         #   The lower the number the more it accelerates
         #   Keep this number between 0.8 and 1 (or otherwise it's very extreme)
         #   Anything over 1 will slow down as you get longer
 
-
-        self.board_size = (30, 30)
+        self.board_size = (100, 50)
         # ^ Size of the grid (width, height)
 
-        self.window_size = (500, 500)
+        self.window_size = (1800, 900)
         # ^ Size of the window (width, height)
 
         self.controls_size = 0

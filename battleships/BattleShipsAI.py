@@ -12,7 +12,7 @@ class Options:
         self.grid_size = (10, 10)
         # ^ Grid size
 
-        self.ships_list = [[5,"Aircraft carrier"], [4,"Battleship"],[3,"Cruiser"],[3,"Submarine"],[2,"Destroyer"]]
+        self.ships_list = [[5, "Aircraft carrier"], [4, "Battleship"], [3, "Cruiser"], [3, "Submarine"], [2, "Destroyer"]]
         # ^ Each ship
         #   Length, then name
         #   Make sure lengths are less than the grid size
@@ -58,7 +58,7 @@ class MainGame:
                         shipplaced = False
 
                 if shipplaced == True:
-                    if shipdirection == "H": # Collision detection
+                    if shipdirection == "H":  # Collision detection
                         for i in range(shiplength):
                             if self.ui.board[shiporigin[0] + i, shiporigin[1]].hidden_value != "•":
                                 # All of the pieces it's replacing must be blank

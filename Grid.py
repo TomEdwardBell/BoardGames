@@ -2,11 +2,13 @@ from PyQt5 import QtWidgets
 from sys import argv
 import random
 
+
 class Options: # Use this to change the options
     def __init__(self):
         self.grid_size = (10, 10)
         self.window_size = (400, 400)
         # ^ Window Size (pixels)
+
 
 class MainGame:
     def __init__(self):
@@ -14,12 +16,12 @@ class MainGame:
         self.set_slots()
 
         self.ui.init_ui()
-
         self.ui.show()
 
     def set_slots(self):
-        for x, y in self.ui.board:
-            self.ui.board[x, y].clicked.connect(lambda state, c=(x, y): self.clicked(c))
+        for (x, y) in self.ui.board:
+            print(x, y)
+            self.ui.board[x, y].clicked.connect(lambda state, c=(x, y): self.clicked((x, y)))
 
     def clicked(self, coords):
         x, y = coords
@@ -89,6 +91,7 @@ class Coord(QtWidgets.QPushButton):
 
     def set_value(self, tochangeto):
         self.setText(str(tochangeto))
+
 
 def main():
     app = QtWidgets.QApplication(argv)
