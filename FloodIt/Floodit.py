@@ -10,7 +10,8 @@ class Options:  # Use this to change the options
         self.window_size = (512, 512)
         # ^ Window Size (pixels)
 
-        self.colors = ["#DD0000", "#00FF00", "#0000FF", "#FFFF00", "#FF00FF", "#FF8800"]
+        self.colors = ["#335500", "#000077", "#4422FF", "#11BB33", "#992299", "#EE2211"]
+
         # ^ All of the colors that could appear on the board
 
 
@@ -21,7 +22,6 @@ class MainGame:
         self.ui = Grid(self)
 
         self.ui.init_ui()
-
         self.color_pieces()
         self.click_color = "#000000"
         self.territory = [(0, 0)]
