@@ -4,15 +4,15 @@ import random
 
 class Options():
     def __init__(self):
-        self.grid_size = (20, 20)
+        self.grid_size = (50, 50)
         # ^ Grid size
         #   (Width, Height)
 
-        self.window_size = (800, 800)
+        self.window_size = (900, 900)
         # ^ Window size
         #   Pixels
 
-        self.mine_count = 30
+        self.mine_count = 200
         # ^ Number of mines on the board
 
 

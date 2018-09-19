@@ -10,7 +10,7 @@ class Options:  # Use this to change the options
         self.window_size = (512, 512)
         # ^ Window Size (pixels)
 
-        self.colors = ["#335500", "#000077", "#4422FF", "#11BB33", "#992299", "#EE2211"]
+        self.colors = ["#FFFFFF", "#004225", "#E8000D", "#0444A4", "#F9A602", "#D86B93", "#87794E"]
 
         # ^ All of the colors that could appear on the board
 
